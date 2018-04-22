@@ -62,6 +62,7 @@ input{
 
 textarea{
   padding-left: 15px;
+  resize: none;
 }
 
 h2{
@@ -154,6 +155,7 @@ h2{
   border: 1px solid white;
   border-radius: 10px;  
   overflow: hidden;
+  position: relative;
 }
 
 .photo-square img{
@@ -221,4 +223,21 @@ h2{
   align-items: center;
   cursor: pointer;
   background-color: #777777;
+}
+
+#content #delete-photo{
+  height: 30px;
+  width: 30px;
+  font-size: 2em;
+  border: 2px solid white;
+  border-radius: 50%;
+  padding: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  background-color: #777777;
+  position: absolute;
+  right: calc(50% - 22px);
+  top: calc(50% - 22px);
 }

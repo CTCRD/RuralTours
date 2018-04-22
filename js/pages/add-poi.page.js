@@ -66,7 +66,26 @@ function renderPoiPage(){
     sources.push(src)
     modal.addClass('hide-me')
     input.val('')
-    app.find('#photo-list').append(photo(src))
+    try{
+      app.find('#photo-list').append(photo(src))
+      app.find('#photo-list .photo-square:last-child').click( e =>{
+        swal({
+          title: "Borrar esta foto?",
+          icon: "warning",
+          buttons: true,
+          dangerMode: true,
+        }).then( res =>{
+          if(res){
+            let find = $(e.target).find('img').attr('src')
+            sources.splice(sources.indexOf(find),1)
+            e.currentTarget.remove()
+          }
+        })
+      })
+    } catch {
+      app.find('#photo-list .photo-square:last-child').remove()
+    }
+
   })
 
   app.find('#poi-add').click(()=>{
@@ -101,7 +120,10 @@ function renderPoiPage(){
     return html`
       <div class="photo-square">
         ${ src ? 
-        `<img src="${src}"/>` : 
+        `
+          <div id="delete-photo">&#215;</div>
+          <img src="${src}"/>
+        ` : 
         `<div id="photo-add">+</div>` }
       </div>
     `
