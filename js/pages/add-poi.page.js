@@ -1,6 +1,7 @@
 function renderPoiPage(){
   var app = $('#app').html( html`
     <div id='content'>
+      <div id="go-to-home">&#9664;</div>
       <h2>Rural Tours - Agregar sitio</h2>
       <form action="javascript:void(0)">
         <div class="row three">
@@ -53,6 +54,10 @@ function renderPoiPage(){
     modal.removeClass('hide-me')
   })
 
+  app.find('#go-to-home').click(()=>{
+    Router.go()
+  })
+
 
   app.find('#poi-modal-content button').click(()=>{
     let input = modal.find('input')
@@ -75,15 +80,21 @@ function renderPoiPage(){
       swal("Necesitamos fotos!", "", "error");
       return;
     }
-    Loading.show()
-    setTimeout(()=>{
-      Loading.hide()
 
-      
+    let newPOI = {}
+    form.forEach(field => newPOI[field.name] = field.value)
+    newPOI.photos = sources;
+    newPOI.location = { lat: newPOI.lat, lng: newPOI.lng }
+    delete newPOI.lat
+    delete newPOI.lng
+
+    Loading.show()
+    axios.post('http://api.ruraltours.online/api/pois', newPOI).then(()=>{
+      Loading.hide()
       swal("Sitio agregado!", "", "success").then( res =>{
         res && Router.reload()
       })
-    },1000)
+    })
   })
 
   function photo(src){

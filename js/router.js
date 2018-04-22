@@ -22,7 +22,7 @@ var Router = (() =>{
   }
 
   function go(hash){
-    history.pushState(null, null, '#' + (hash == 'home'? '' : hash));
+    history.pushState(null, null, '#' + (hash == 'home' || !hash ? '' : hash));
     reload()
   }
   
