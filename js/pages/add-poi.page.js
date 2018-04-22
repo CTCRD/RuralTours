@@ -1,7 +1,7 @@
 function renderPoiPage(){
   var app = $('#app').html( html`
     <div id='content'>
-      <div id="go-to-home">&#9664;</div>
+      <div id="go-to-home">&#215;</div>
       <h2>Rural Tours - Agregar sitio</h2>
       <form action="javascript:void(0)">
         <div class="row three">
