@@ -80,7 +80,7 @@ function renderPoiPage(){
       Loading.hide()
 
       
-      swal("Sitio agregado!").then( res =>{
+      swal("Sitio agregado!", "", "success").then( res =>{
         res && Router.reload()
       })
     },1000)

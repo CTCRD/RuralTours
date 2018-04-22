@@ -185,3 +185,9 @@ h2{
 .hide-me{
   display: none !important;
 }
+
+/** HOME */
+#map{
+  height: calc(100vh - 100px);
+  width: 100vw;
+}

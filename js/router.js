@@ -1,6 +1,6 @@
 var Router = (() =>{
   let callbacks = {
-    'home':()=>{ renderPoiPage() },
+    'home':()=>{ renderHomePage() },
     'add-poi':()=>{ renderPoiPage() },
   }
 
