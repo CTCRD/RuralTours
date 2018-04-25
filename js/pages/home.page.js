@@ -38,7 +38,6 @@ function renderHomePage(){
   var prevBounds = JSON.parse(JSON.stringify(strictBounds));
 
   google.maps.event.addListener(map, 'bounds_changed', function () {
-    console.log("yooo")
     var bounds = map.getBounds(),
         newNE = {
           lat: bounds.getNorthEast().lat(), 
@@ -63,6 +62,7 @@ function renderHomePage(){
         if(newSW.lat > strictSW.lat) newSW.lat = prevBounds.prevSW.lat
         if(newSW.lng > strictSW.lng) newSW.lng = prevBounds.prevSW.lng
         map.fitBounds(new google.maps.LatLngBounds(newSW, newNE))
+        console.log("out of bounds")
       } else if(strictBounds.contains(newNE) && strictBounds.contains(newSW))
         prevBounds = {
           prevNE: newNE,
@@ -103,19 +103,11 @@ function renderHomePage(){
         ZOOM_IN = 73,
         ZOOM_OUT = 79
       
-      if(key[UP]) {
-        center.lat += movement
-      }
-      if(key[DOWN]){
-        center.lat -= movement
-      } 
-      if(key[LEFT]) {
-        center.lng -= movement
-      }
-      if(key[RIGHT]) {
-        center.lng += movement
-      }
-      map.setCenter(center)
+      if(key[UP]) center.lat += movement
+      if(key[DOWN]) center.lat -= movement
+      if(key[LEFT]) center.lng -= movement
+      if(key[RIGHT]) center.lng += movement
+      if(key[UP] || key[DOWN] || key[LEFT] || key[RIGHT]) map.setCenter(center)
       
       if(key[ZOOM_IN] && map.getZoom() < 14) map.setZoom(map.getZoom() + 1)
       if(key[ZOOM_OUT]) map.setZoom(map.getZoom() - 1)
