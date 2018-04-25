@@ -212,7 +212,7 @@ h2{
 /** HOME */
 #map{
   height: calc(100vh - 100px);
-  width: calc(100vw - 400px);
+  width: calc(100vw - 300px);
 }
 
 #nav{
@@ -276,7 +276,7 @@ h2{
   display: flex;
 }
 #side-bar{
-  width:400px;
+  width:300px;
   height: calc(100vh - 100px);
   display: flex;
   flex-direction: column;
@@ -286,7 +286,7 @@ h2{
 
 .poi-side{
   min-height: 100px;
-  width: 390px;
+  width: 270px;
   display: flex;
   padding: 10px 5px;
   align-items: center;
