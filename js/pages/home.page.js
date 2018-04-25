@@ -59,11 +59,11 @@ function renderHomePage(){
       
       if(!strictBounds.contains(newNE) || !strictBounds.contains(newSW)){
         if(newNE.lat < strictNE.lat) newNE.lat = prevBounds.prevNE.lat
-        else if(newSW.lat > strictSW.lat) newSW.lat = prevBounds.prevSW.lat
         if(newNE.lng < strictNE.lng) newNE.lng = prevBounds.prevNE.lng
-        else if(newSW.lng > strictSW.lng) newSW.lng = prevBounds.prevSW.lng
+        if(newSW.lat > strictSW.lat) newSW.lat = prevBounds.prevSW.lat
+        if(newSW.lng > strictSW.lng) newSW.lng = prevBounds.prevSW.lng
         map.fitBounds(new google.maps.LatLngBounds(newSW, newNE))
-      } else
+      } else if(strictBounds.contains(newNE) && strictBounds.contains(newSW))
         prevBounds = {
           prevNE: newNE,
           prevSW: newSW
@@ -136,7 +136,7 @@ function renderHomePage(){
     return html`
       <div class="poi-side">
         <img src='${poi.photos[0]}'/>
-        <span>${poi.name}</span>n
+        <span>${poi.name}</span>
         <!-- <span>${poi.description}</span> -->
       </div>
     `

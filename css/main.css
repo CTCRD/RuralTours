@@ -280,19 +280,26 @@ h2{
   height: calc(100vh - 100px);
   display: flex;
   flex-direction: column;
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .poi-side{
-  height: 100px;
-  padding: 5px;
-  border: 1px solid slategray;
-  border-radius: 10px;
+  min-height: 100px;
+  width: 390px;
+  display: flex;
+  padding: 10px 5px;
+  align-items: center;
+}
 
+.poi-side:not(:last-child){
+  border-bottom: 3px solid rgb(190, 190, 190);
 }
 
 .poi-side img{
   object-fit: cover;
   height: 100px;
   width: 100px;
+  border-radius: 50px;
+  margin-right: 30px;
 }
