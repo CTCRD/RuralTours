@@ -1,11 +1,20 @@
 function renderHomePage(){
   var app = $('#app').html( html`
     <div id="nav">
-      <div id="go-to-add-poi">+</div>
+      <!-- <div id="go-to-add-poi">+</div> -->
+      <div style="display: flex; justify-content: center; align-items: center; margin-left: 50px;">
+        <img style="width: 50px; height: 50px; object-fit: cover;" src="/img/rural_icon.png"></img>
+        <span style="font-size: 1.8em; margin-left: 20px;">Rural Tours</span>
+      </div>
     </div>
-    <div id="divide">
+    <div id="divide-home">
       <div id="side-bar"></div>
       <div id="map"></div>
+    </div>
+    <div id="poi-detail-modal-bkg" class="hide-me">
+      <div id="poi-detail-modal-content" style="width">
+        <h4> Introducir link</h4>
+      </div>
     </div>
   `)
   app.find('#go-to-add-poi').click(()=>{
@@ -58,13 +67,15 @@ function renderHomePage(){
   let markers = []
   axios.get('http://api.ruraltours.online/api/pois').then((response) =>{
     console.log("response", response.data)
-    response.data.forEach(poi =>{
+    response.data.reverse().forEach(poi =>{
       let marker = new google.maps.Marker({
         position: poi.location,
-        map: map
+        map: map,
+        icon: '/img/rural_icon.png'
       })
       marker.addListener('click', ()=>{swal("Has seleccionado: " + poi.name)})
       markers.push(marker)
+      $('#side-bar').append(poiSide(poi))
     })
   });
 
@@ -116,11 +127,20 @@ function renderHomePage(){
       center.lng += movement
       map.setCenter(center)
     }
-    // map.setZoom(map.getZoom() + 2)
-    // console.log(event.keyCode)
+    console.log(event.keyCode)
 
   }
 
   document.addEventListener('keydown', keypress);
   document.addEventListener('keyup', keypress);
+
+  function poiSide(poi){
+    return html`
+      <div class="poi-side">
+        <img src='${poi.photos[0]}'/>
+        <span>${poi.name}</span>n
+        <!-- <span>${poi.description}</span> -->
+      </div>
+    `
+  }
 }

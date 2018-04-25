@@ -13,7 +13,9 @@ var Router = (() =>{
     }
   }
 
-  reload()
+  $(document).ready(()=>{
+    reload()
+  })
 
   function params(){
     let hash = window.location.pathname.substr(1).split('/')

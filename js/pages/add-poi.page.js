@@ -29,7 +29,9 @@ function renderPoiPage(){
         <div class="input-group full">
           <label> Link de foto </label>
           <div id="photo-list">
-            ${photo()}          
+            <div class="photo-square">
+              <div id="photo-add">+</div>
+            </div>      
           </div>
         </div>
       </div>
@@ -82,7 +84,7 @@ function renderPoiPage(){
           }
         })
       })
-    } catch {
+    } catch(error) {
       app.find('#photo-list .photo-square:last-child').remove()
     }
 
@@ -119,12 +121,8 @@ function renderPoiPage(){
   function photo(src){
     return html`
       <div class="photo-square">
-        ${ src ? 
-        `
           <div id="delete-photo">&#215;</div>
           <img src="${src}"/>
-        ` : 
-        `<div id="photo-add">+</div>` }
       </div>
     `
   }
