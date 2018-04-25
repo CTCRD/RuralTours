@@ -115,6 +115,9 @@ function renderPoiPage(){
       swal("Sitio agregado!", "", "success").then( res =>{
         res && Router.reload()
       })
+    }).catch(()=>{
+      Loading.hide()
+      swal("Error de red, intentar luego", "", "error")
     })
   })
 

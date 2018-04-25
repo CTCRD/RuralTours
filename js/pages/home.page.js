@@ -31,11 +31,14 @@ function renderHomePage(){
   });
 
   var strictBounds = new google.maps.LatLngBounds(
-    new google.maps.LatLng(17.696531, -72.984063),
-    new google.maps.LatLng(20.068997, -68.007257)
+    { lat: 17.696531, lng: -72.984063 },
+    { lat: 20.068997, lng: -68.007257 }
   )
-  
+
+  var prevBounds = JSON.parse(JSON.stringify(strictBounds));
+
   google.maps.event.addListener(map, 'bounds_changed', function () {
+    console.log("yooo")
     var bounds = map.getBounds(),
         newNE = {
           lat: bounds.getNorthEast().lat(), 
@@ -55,12 +58,16 @@ function renderHomePage(){
         }
       
       if(!strictBounds.contains(newNE) || !strictBounds.contains(newSW)){
-        if(newNE.lat < strictNE.lat) newNE.lat = strictNE.lat
-        if(newNE.lng < strictNE.lng) newNE.lng = strictNE.lng
-        if(newSW.lat > strictSW.lat) newSW.lat = strictSW.lat
-        if(newSW.lng > strictSW.lng) newSW.lng = strictSW.lng
+        if(newNE.lat < strictNE.lat) newNE.lat = prevBounds.prevNE.lat
+        else if(newSW.lat > strictSW.lat) newSW.lat = prevBounds.prevSW.lat
+        if(newNE.lng < strictNE.lng) newNE.lng = prevBounds.prevNE.lng
+        else if(newSW.lng > strictSW.lng) newSW.lng = prevBounds.prevSW.lng
         map.fitBounds(new google.maps.LatLngBounds(newSW, newNE))
-      }
+      } else
+        prevBounds = {
+          prevNE: newNE,
+          prevSW: newSW
+        }
 
   });
   
@@ -77,59 +84,50 @@ function renderHomePage(){
       markers.push(marker)
       $('#side-bar').append(poiSide(poi))
     })
+  }).catch(()=>{
+    swal("Error de red, intentar luego", "", "error")
   });
 
   let key = {}
   function keypress(event){
-    key[event.keyCode] = event.type == 'keydown';
+    event && (key[event.keyCode] = (event && event.type) == 'keydown')
     var center = {
           lat: map.getCenter().lat(), 
           lng: map.getCenter().lng()
         },
-        movement = 0.008,
-        UP = 87, 
-        DOWN = 83, 
+        movement =( 22-map.getZoom())/1000,
+        UP = 87,
+        DOWN = 83,
         LEFT = 65,
         RIGHT = 68,
         ZOOM_IN = 73,
         ZOOM_OUT = 79
-
-    if(key[ZOOM_IN] && map.getZoom() < 14){
-      map.setZoom(map.getZoom() + 1)
-    } else if(key[ZOOM_OUT]){
-      map.setZoom(map.getZoom() - 1)
-    } else if(key[UP] && key[LEFT]){
-      center.lat += movement
-      center.lng -= movement
+      
+      if(key[UP]) {
+        center.lat += movement
+      }
+      if(key[DOWN]){
+        center.lat -= movement
+      } 
+      if(key[LEFT]) {
+        center.lng -= movement
+      }
+      if(key[RIGHT]) {
+        center.lng += movement
+      }
       map.setCenter(center)
-    } else if(key[UP] && key[RIGHT]){
-      center.lat += movement
-      center.lng += movement
-      map.setCenter(center)
-    } else if(key[RIGHT] && key[DOWN]){
-      center.lng += movement
-      center.lat -= movement
-      map.setCenter(center)
-    } else if(key[DOWN] && key[LEFT]){
-      center.lat -= movement
-      center.lng -= marginas
-      map.setCenter(center)
-    } else if(key[UP]) { 
-      center.lat += movement; 
-      map.setCenter(center) 
-    } else if(key[DOWN]){
-      center.lat -= movement
-      map.setCenter(center)
-    } else if(key[LEFT]){
-      center.lng -= movement
-      map.setCenter(center)
-    } else if(key[RIGHT]){
-      center.lng += movement
-      map.setCenter(center)
+      
+      if(key[ZOOM_IN] && map.getZoom() < 14) map.setZoom(map.getZoom() + 1)
+      if(key[ZOOM_OUT]) map.setZoom(map.getZoom() - 1)
+      
+      // console.log(event.keyCode)
+      if(event && event.type == 'keydown')
+        google.maps.event.addListener(map, 'idle', ()=>{
+          keypress()
+          google.maps.event.clearListeners(map, 'idle')
+        })
     }
-    console.log(event.keyCode)
 
-  }
 
   document.addEventListener('keydown', keypress);
   document.addEventListener('keyup', keypress);
