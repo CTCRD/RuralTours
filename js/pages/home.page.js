@@ -77,7 +77,6 @@ function renderHomePage(){
   });
   
   axios.get('http://api.ruraltours.online/api/pois').then((response) =>{
-    console.log("response", response.data)
     pois = response.data.reverse()
     pois.forEach(poi =>{
       let marker = new google.maps.Marker({
