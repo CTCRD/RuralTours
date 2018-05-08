@@ -31,44 +31,48 @@ function renderHomePage(){
   });
 
   var strictBounds = new google.maps.LatLngBounds(
-    { lat: 17.696531, lng: -72.984063 },
-    { lat: 20.068997, lng: -68.007257 }
-  )
-
-  var prevBounds = JSON.parse(JSON.stringify(strictBounds));
-
-  google.maps.event.addListener(map, 'bounds_changed', function () {
+        { lat: 17.696531, lng: -72.984063 },/* SW */
+        { lat: 20.068997, lng: -68.007257 } /* NE */
+      ),
+      strictSW = {
+        lat: strictBounds.getSouthWest().lat(), 
+        lng: strictBounds.getSouthWest().lng()
+      },
+      strictNE = {
+        lat: strictBounds.getNorthEast().lat(), 
+        lng: strictBounds.getNorthEast().lng()
+      },
+      prevSW = strictSW,
+      prevNE = strictNE,
+      timeout = 0      
+  
+  function adjustBounds(){
     var bounds = map.getBounds(),
-        newNE = {
-          lat: bounds.getNorthEast().lat(), 
-          lng: bounds.getNorthEast().lng()
-        },
         newSW = {
           lat: bounds.getSouthWest().lat(), 
           lng: bounds.getSouthWest().lng()
         },
-        strictNE = {
-          lat: strictBounds.getNorthEast().lat(), 
-          lng: strictBounds.getNorthEast().lng()
+        newNE = {
+          lat: bounds.getNorthEast().lat(), 
+          lng: bounds.getNorthEast().lng()
         },
-        strictSW = {
-          lat: strictBounds.getSouthWest().lat(), 
-          lng: strictBounds.getSouthWest().lng()
-        }
-      
-      if(!strictBounds.contains(newNE) || !strictBounds.contains(newSW)){
-        if(newNE.lat < strictNE.lat) newNE.lat = prevBounds.prevNE.lat
-        if(newNE.lng < strictNE.lng) newNE.lng = prevBounds.prevNE.lng
-        if(newSW.lat > strictSW.lat) newSW.lat = prevBounds.prevSW.lat
-        if(newSW.lng > strictSW.lng) newSW.lng = prevBounds.prevSW.lng
-        map.fitBounds(new google.maps.LatLngBounds(newSW, newNE))
-        console.log("out of bounds")
-      } else if(strictBounds.contains(newNE) && strictBounds.contains(newSW))
-        prevBounds = {
-          prevNE: newNE,
-          prevSW: newSW
-        }
+        adjust = false
 
+    if(newSW.lat < strictSW.lat) (newSW.lat = strictSW.lat) && (adjust = true)
+    if(newSW.lng < strictSW.lng) (newSW.lng = strictSW.lng) && (adjust = true)
+    if(newNE.lat > strictNE.lat) (newNE.lat = strictNE.lat) && (adjust = true)
+    if(newNE.lng > strictNE.lng) (newNE.lng = strictNE.lng) && (adjust = true)
+
+    if( adjust ){
+      let prevZoom = map.getZoom()
+      map.fitBounds(new google.maps.LatLngBounds(newSW, newNE))
+      map.setZoom(prevZoom)
+    }
+  }
+
+  google.maps.event.addListener(map, 'bounds_changed', function () {
+    clearTimeout(timeout)
+    timeout = setTimeout(adjustBounds, 10)
   });
   
   let markers = []
@@ -103,22 +107,22 @@ function renderHomePage(){
         ZOOM_IN = 73,
         ZOOM_OUT = 79
       
-      if(key[UP]) center.lat += movement
-      if(key[DOWN]) center.lat -= movement
-      if(key[LEFT]) center.lng -= movement
-      if(key[RIGHT]) center.lng += movement
-      if(key[UP] || key[DOWN] || key[LEFT] || key[RIGHT]) map.setCenter(center)
-      
-      if(key[ZOOM_IN] && map.getZoom() < 14) map.setZoom(map.getZoom() + 1)
-      if(key[ZOOM_OUT]) map.setZoom(map.getZoom() - 1)
-      
-      // console.log(event.keyCode)
-      if(event && event.type == 'keydown')
-        google.maps.event.addListener(map, 'idle', ()=>{
-          keypress()
-          google.maps.event.clearListeners(map, 'idle')
-        })
-    }
+    if(key[UP]) center.lat += movement
+    if(key[DOWN]) center.lat -= movement
+    if(key[LEFT]) center.lng -= movement
+    if(key[RIGHT]) center.lng += movement
+    if(key[UP] || key[DOWN] || key[LEFT] || key[RIGHT]) map.setCenter(center)
+    
+    if(key[ZOOM_IN] && map.getZoom() < 14) map.setZoom(map.getZoom() + 1)
+    if(key[ZOOM_OUT]) map.setZoom(map.getZoom() - 1)
+    
+    // console.log(event.keyCode)
+    if(event && event.type == 'keydown')
+      google.maps.event.addListener(map, 'idle', ()=>{
+        keypress()
+        google.maps.event.clearListeners(map, 'idle')
+      })
+  }
 
 
   document.addEventListener('keydown', keypress);
