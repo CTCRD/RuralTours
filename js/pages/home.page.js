@@ -44,7 +44,7 @@ function renderHomePage(){
       prevSW = strictSW,
       prevNE = strictNE,
       timeout = 0,
-      markers,
+      markers = [],
       pois
   
   function adjustBounds(){
