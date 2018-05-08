@@ -13,9 +13,10 @@ function renderHomePage(){
     </div>
     <div id="poi-detail-modal-bkg" class="hide-me">
       <div id="poi-detail-modal-content" style="width">
-        <h4> Introducir link</h4>
+
       </div>
     </div>
+    
   `)
   app.find('#go-to-add-poi').click(()=>{
     Router.go('add-poi')
@@ -95,7 +96,7 @@ function renderHomePage(){
         map: map,
         icon: '/img/rural_icon.png'
       })
-      marker.addListener('click', ()=>{swal("Has seleccionado: " + poi.name)})
+      marker.addListener('click', ()=>{poiView(poi)})
       markers.push(marker)
       side.append(poiSide(poi))
 
@@ -164,5 +165,26 @@ function renderHomePage(){
         <!-- <span>${poi.description}</span> -->
       </div>
     `
+  }
+  function poiView(poi){
+    
+    var modal = $('#poi-detail-modal-bkg')
+    modal.find('#poi-detail-modal-content').html( html`
+      <h2>${poi.name}</h2>
+      <p class="poi-descripcion">${poi.description}</p>
+      <img src='${poi.photos[0]}' width="250px" height="150px">
+    `)
+    poi.forEach(function(picture) {
+      console.log(picture);
+  });
+    modal.removeClass('hide-me')
+    modal.click(()=>{
+      hidePoiDetails()
+    })
+        
+  }
+
+  function hidePoiDetails(){
+    $('#poi-detail-modal-bkg').addClass('hide-me')
   }
 }
