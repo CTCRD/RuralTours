@@ -21,16 +21,15 @@ function renderHomePage(){
     Router.go('add-poi')
   })
    
-  var ctc = {lat: 18.860430, lng: -70.169053}
-  var map = new google.maps.Map(app.find('#map')[0], {
-    zoom: 9,
-    minZoom: 9,
-    center: ctc,
-    styles: [{"featureType":"administrative","elementType":"labels.text.fill","stylers":[{"color":"#444444"}]},{"featureType":"administrative.country","elementType":"geometry","stylers":[{"visibility":"off"},{"hue":"#ffb800"}]},{"featureType":"administrative.country","elementType":"geometry.fill","stylers":[{"visibility":"on"}]},{"featureType":"administrative.province","elementType":"labels.icon","stylers":[{"hue":"#ff0000"},{"visibility":"on"}]},{"featureType":"landscape","elementType":"all","stylers":[{"color":"#f2f2f2"}]},{"featureType":"poi","elementType":"all","stylers":[{"visibility":"off"}]},{"featureType":"road","elementType":"all","stylers":[{"saturation":-100},{"lightness":45}]},{"featureType":"road.highway","elementType":"all","stylers":[{"visibility":"simplified"}]},{"featureType":"road.arterial","elementType":"labels.icon","stylers":[{"visibility":"off"}]},{"featureType":"transit","elementType":"all","stylers":[{"visibility":"off"}]},{"featureType":"water","elementType":"all","stylers":[{"color":"#46bcec"},{"visibility":"on"}]}],
-    disableDefaultUI: true
-  });
-
-  var strictBounds = new google.maps.LatLngBounds(
+  var drIslandCenter = { lat: 18.860430, lng: -70.169053 },
+      map = new google.maps.Map(app.find('#map')[0], {
+        zoom: 9,
+        minZoom: 9,
+        center: drIslandCenter,
+        styles: [{"featureType":"administrative","elementType":"labels.text.fill","stylers":[{"color":"#444444"}]},{"featureType":"administrative.country","elementType":"geometry","stylers":[{"visibility":"off"},{"hue":"#ffb800"}]},{"featureType":"administrative.country","elementType":"geometry.fill","stylers":[{"visibility":"on"}]},{"featureType":"administrative.province","elementType":"labels.icon","stylers":[{"hue":"#ff0000"},{"visibility":"on"}]},{"featureType":"landscape","elementType":"all","stylers":[{"color":"#f2f2f2"}]},{"featureType":"poi","elementType":"all","stylers":[{"visibility":"off"}]},{"featureType":"road","elementType":"all","stylers":[{"saturation":-100},{"lightness":45}]},{"featureType":"road.highway","elementType":"all","stylers":[{"visibility":"simplified"}]},{"featureType":"road.arterial","elementType":"labels.icon","stylers":[{"visibility":"off"}]},{"featureType":"transit","elementType":"all","stylers":[{"visibility":"off"}]},{"featureType":"water","elementType":"all","stylers":[{"color":"#46bcec"},{"visibility":"on"}]}],
+        disableDefaultUI: true
+      }),
+      strictBounds = new google.maps.LatLngBounds(
         { lat: 17.696531, lng: -72.984063 },/* SW */
         { lat: 20.068997, lng: -68.007257 } /* NE */
       ),
@@ -44,7 +43,9 @@ function renderHomePage(){
       },
       prevSW = strictSW,
       prevNE = strictNE,
-      timeout = 0      
+      timeout = 0,
+      markers,
+      pois
   
   function adjustBounds(){
     var bounds = map.getBounds(),
@@ -75,10 +76,10 @@ function renderHomePage(){
     timeout = setTimeout(adjustBounds, 10)
   });
   
-  let markers = []
   axios.get('http://api.ruraltours.online/api/pois').then((response) =>{
     console.log("response", response.data)
-    response.data.reverse().forEach(poi =>{
+    pois = response.data.reverse()
+    pois.forEach(poi =>{
       let marker = new google.maps.Marker({
         position: poi.location,
         map: map,
@@ -123,7 +124,6 @@ function renderHomePage(){
         google.maps.event.clearListeners(map, 'idle')
       })
   }
-
 
   document.addEventListener('keydown', keypress);
   document.addEventListener('keyup', keypress);
