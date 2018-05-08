@@ -89,6 +89,7 @@ function renderHomePage(){
  
   axios.get('http://api.ruraltours.online/api/pois').then((response) =>{
     response.data.reverse().forEach(poi =>{
+      let side =  $('#side-bar')
       let marker = new google.maps.Marker({
         position: poi.location,
         map: map,
@@ -96,8 +97,13 @@ function renderHomePage(){
       })
       marker.addListener('click', ()=>{swal("Has seleccionado: " + poi.name)})
       markers.push(marker)
-      pois.push(Object.assign({ marker: marker}, poi))
-      $('#side-bar').append(poiSide(poi))
+      side.append(poiSide(poi))
+
+      pois.push({
+        ...poi,
+        marker: marker, 
+        el: side.children().last() 
+      })
     })
   }).catch(()=>{
     swal("Error de red, intentar luego", "", "error")
@@ -115,7 +121,9 @@ function renderHomePage(){
         LEFT = 65,
         RIGHT = 68,
         ZOOM_IN = 73,
-        ZOOM_OUT = 79
+        ZOOM_OUT = 79,
+        PREV = 81,
+        NEXT = 69
       
     if(keyPress[UP]) center.lat += movement
     if(keyPress[DOWN]) center.lat -= movement
@@ -125,6 +133,8 @@ function renderHomePage(){
     
     if(keyPress[ZOOM_IN] && map.getZoom() < 14) map.setZoom(map.getZoom() + 1)
     if(keyPress[ZOOM_OUT]) map.setZoom(map.getZoom() - 1)
+    if(keyPress[PREV]) console.log(visiblePois[0].el)
+    if(keyPress[NEXT]) void(0)
     
     // console.log(event.keyCode)
     if(event && event.type == 'keydown')
