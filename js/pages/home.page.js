@@ -43,9 +43,10 @@ function renderHomePage(){
       },
       prevSW = strictSW,
       prevNE = strictNE,
-      timeout = 0,
+      timeout = 0, timeout2 = 0
       markers = [],
-      pois
+      pois = [], visiblePois = [],
+      keyPress = {}
   
   function adjustBounds(){
     var bounds = map.getBounds(),
@@ -71,14 +72,23 @@ function renderHomePage(){
     }
   }
 
-  google.maps.event.addListener(map, 'bounds_changed', function () {
-    clearTimeout(timeout)
-    timeout = setTimeout(adjustBounds, 10)
-  });
+  function reloadPois(){
+    clearTimeout(timeout2)
+    timeout2 = setTimeout(proceed, 100)
+
+    function proceed(){
+      let side = $('#side-bar')
+      side.html('')
   
+      visiblePois = pois.filter( poi => map.getBounds().contains(poi.location))
+      visiblePois.forEach( poi =>{
+        side.append(poiSide(poi))
+      })
+    }
+  }
+ 
   axios.get('http://api.ruraltours.online/api/pois').then((response) =>{
-    pois = response.data.reverse()
-    pois.forEach(poi =>{
+    response.data.reverse().forEach(poi =>{
       let marker = new google.maps.Marker({
         position: poi.location,
         map: map,
@@ -86,15 +96,15 @@ function renderHomePage(){
       })
       marker.addListener('click', ()=>{swal("Has seleccionado: " + poi.name)})
       markers.push(marker)
+      pois.push(Object.assign({ marker: marker}, poi))
       $('#side-bar').append(poiSide(poi))
     })
   }).catch(()=>{
     swal("Error de red, intentar luego", "", "error")
   });
-
-  let key = {}
-  function keypress(event){
-    event && (key[event.keyCode] = (event && event.type) == 'keydown')
+  
+  function keyPressControl(event){
+    event && (keyPress[event.keyCode] = (event && event.type) == 'keydown')
     var center = {
           lat: map.getCenter().lat(), 
           lng: map.getCenter().lng()
@@ -107,25 +117,34 @@ function renderHomePage(){
         ZOOM_IN = 73,
         ZOOM_OUT = 79
       
-    if(key[UP]) center.lat += movement
-    if(key[DOWN]) center.lat -= movement
-    if(key[LEFT]) center.lng -= movement
-    if(key[RIGHT]) center.lng += movement
-    if(key[UP] || key[DOWN] || key[LEFT] || key[RIGHT]) map.setCenter(center)
+    if(keyPress[UP]) center.lat += movement
+    if(keyPress[DOWN]) center.lat -= movement
+    if(keyPress[LEFT]) center.lng -= movement
+    if(keyPress[RIGHT]) center.lng += movement
+    if(keyPress[UP] || keyPress[DOWN] || keyPress[LEFT] || keyPress[RIGHT]) map.setCenter(center)
     
-    if(key[ZOOM_IN] && map.getZoom() < 14) map.setZoom(map.getZoom() + 1)
-    if(key[ZOOM_OUT]) map.setZoom(map.getZoom() - 1)
+    if(keyPress[ZOOM_IN] && map.getZoom() < 14) map.setZoom(map.getZoom() + 1)
+    if(keyPress[ZOOM_OUT]) map.setZoom(map.getZoom() - 1)
     
     // console.log(event.keyCode)
     if(event && event.type == 'keydown')
       google.maps.event.addListener(map, 'idle', ()=>{
-        keypress()
+        keyPressControl()
         google.maps.event.clearListeners(map, 'idle')
       })
   }
 
-  document.addEventListener('keydown', keypress);
-  document.addEventListener('keyup', keypress);
+  document.addEventListener('keydown', keyPressControl);
+  document.addEventListener('keyup', keyPressControl);
+
+  google.maps.event.addListener(map, 'bounds_changed', ()=>{
+    clearTimeout(timeout)
+    timeout = setTimeout(adjustBounds, 10)
+  });
+
+  google.maps.event.addListener(map, 'zoom_changed', reloadPois)
+  google.maps.event.addListener(map, 'dragend', reloadPois)
+  google.maps.event.addListener(map, 'center_changed', reloadPois)
 
   function poiSide(poi){
     return html`
