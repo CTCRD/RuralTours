@@ -1,4 +1,4 @@
-function renderPoiPage(){
+function renderPoiPage(poi){
   var app = $('#app').html( html`
     <div id='content'>
       <div id="go-to-home">&#215;</div>
@@ -7,21 +7,21 @@ function renderPoiPage(){
         <div class="row three">
           <div class="input-group">
             <label for="poi-name"> Nombre </label>
-            <input name="name" id="poi-name"/>
+            <input name="name" id="poi-name" value="${poi ? poi.name : ''}"/>
           </div>
           <div class="input-group">
             <label for="poi-lat"> Latitud </label>
-            <input name="lat" id="poi-lat"/>
+            <input name="lat" id="poi-lat" value="${poi ? poi.location.lat : ''}"/>
           </div>
           <div class="input-group">
             <label for="poi-lng"> Longitud </label>
-            <input name="lng" id="poi-lng"/>
+            <input name="lng" id="poi-lng" value="${poi ? poi.location.lng : ''}"/>
           </div>
         </div>
         <div class="row">
           <div class="input-group full">
             <label for="poi-description"> Descripción </label>
-            <textarea name="description" rows="8" id="poi-description"></textarea>
+            <textarea name="description" rows="8" id="poi-description">${poi ? poi.description : ''}</textarea>
           </div>
         </div>
       </form>
@@ -31,11 +31,11 @@ function renderPoiPage(){
           <div id="photo-list">
             <div class="photo-square">
               <div id="photo-add">+</div>
-            </div>      
+            </div>
           </div>
         </div>
       </div>
-      <button id="poi-add">Agregar</button>
+      <button id="poi-add">${poi ? "Actualizar" : "Agregar"}</button>
       <div id="poi-modal-bkg" class="hide-me">
         <div id="poi-modal-content">
           <h4> Introducir link</h4>
@@ -45,9 +45,9 @@ function renderPoiPage(){
       </div>
     </div>
   `)
-  let sources = []
+  let sources = poi ? poi.photos : []
   let modal = app.find('#poi-modal-bkg')
-
+  
   modal.click(e =>{
     $(e.target).is(modal) && modal.addClass('hide-me')
   })
@@ -59,15 +59,10 @@ function renderPoiPage(){
   app.find('#go-to-home').click(()=>{
     Router.go()
   })
-
-
-  app.find('#poi-modal-content button').click(()=>{
-    let input = modal.find('input')
-    let src = input.val()
-    if(src == '') return
+  
+  function addPhoto(src){
     sources.push(src)
     modal.addClass('hide-me')
-    input.val('')
     try{
       app.find('#photo-list').append(photo(src))
       app.find('#photo-list .photo-square:last-child').click( e =>{
@@ -87,7 +82,16 @@ function renderPoiPage(){
     } catch(error) {
       app.find('#photo-list .photo-square:last-child').remove()
     }
+  }
+  
+  if(poi) sources.forEach( el => addPhoto(el))
 
+  app.find('#poi-modal-content button').click(() =>{
+    let input = modal.find('input')
+    let src = input.val()
+    if(src == '' ) return
+    addPhoto(src)
+    input.val('')
   })
 
   app.find('#poi-add').click(()=>{
@@ -110,9 +114,9 @@ function renderPoiPage(){
     delete newPOI.lng
 
     Loading.show()
-    axios.post('http://api.ruraltours.online/api/pois', newPOI).then(()=>{
+    axios[poi ? "put" : "post"]('http://api.ruraltours.online/api/pois', newPOI).then(()=>{
       Loading.hide()
-      swal("Sitio agregado!", "", "success").then( res =>{
+      swal("Sitio " + (poi ? "actualizado!" : "agregado!"), "", "success").then( res =>{
         res && Router.reload()
       })
     }).catch(()=>{

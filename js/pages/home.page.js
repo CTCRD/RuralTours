@@ -35,11 +35,11 @@ function renderHomePage(){
         { lat: 20.068997, lng: -68.007257 } /* NE */
       ),
       strictSW = {
-        lat: strictBounds.getSouthWest().lat(), 
+        lat: strictBounds.getSouthWest().lat(),
         lng: strictBounds.getSouthWest().lng()
       },
       strictNE = {
-        lat: strictBounds.getNorthEast().lat(), 
+        lat: strictBounds.getNorthEast().lat(),
         lng: strictBounds.getNorthEast().lng()
       },
       prevSW = strictSW,
@@ -52,11 +52,11 @@ function renderHomePage(){
   function adjustBounds(){
     var bounds = map.getBounds(),
         newSW = {
-          lat: bounds.getSouthWest().lat(), 
+          lat: bounds.getSouthWest().lat(),
           lng: bounds.getSouthWest().lng()
         },
         newNE = {
-          lat: bounds.getNorthEast().lat(), 
+          lat: bounds.getNorthEast().lat(),
           lng: bounds.getNorthEast().lng()
         },
         adjust = false
@@ -99,11 +99,15 @@ function renderHomePage(){
       marker.addListener('click', ()=>{poiView(poi)})
       markers.push(marker)
       side.append(poiSide(poi))
+      let current = side.children().last()
+      current.click(()=>{
+        renderPoiPage(poi)
+      })
 
       pois.push({
         ...poi,
-        marker: marker, 
-        el: side.children().last() 
+        marker: marker,
+        el: current
       })
     })
   }).catch(()=>{
@@ -113,7 +117,7 @@ function renderHomePage(){
   function keyPressControl(event){
     event && (keyPress[event.keyCode] = event.type == 'keydown')
     var center = {
-          lat: map.getCenter().lat(), 
+          lat: map.getCenter().lat(),
           lng: map.getCenter().lng()
         },
         movement =( 22-map.getZoom())/1000,
