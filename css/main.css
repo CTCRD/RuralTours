@@ -110,6 +110,7 @@ h2{
   border-radius: 5px; 
 }
 
+
 #poi-modal-bkg{
   background-color: rgba(0, 0, 0, 0.8);
   position: fixed;
@@ -168,7 +169,10 @@ h2{
 #poi-photo{
   display: none;
 }
-
+.poi-img-photos{
+  width: 250px;
+  height: 150px;  
+}
 .photo-square{
   width: 130px;
   height: 130px;
@@ -179,6 +183,10 @@ h2{
   border-radius: 10px;  
   overflow: hidden;
   position: relative;
+}
+.poi-div-photos{
+  overflow: auto;
+overflow-y: hidden;
 }
 
 .photo-square img{

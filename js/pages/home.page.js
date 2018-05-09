@@ -172,10 +172,10 @@ function renderHomePage(){
     modal.find('#poi-detail-modal-content').html( html`
       <h2>${poi.name}</h2>
       <p class="poi-descripcion">${poi.description}</p>
-      <img src='${poi.photos[0]}' width="250px" height="150px">
+      <div class="poi-div-photos" ></div>
     `)
-    poi.forEach(function(picture) {
-      console.log(picture);
+    $.each(poi.photos,function(index,value){
+      $('.poi-div-photos').append("<img class='poi-img-photos'  src='"+this+"'> ");
   });
     modal.removeClass('hide-me')
     modal.click(()=>{
