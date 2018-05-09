@@ -47,7 +47,8 @@ function renderHomePage(){
       timeout = 0, timeout2 = 0
       markers = [],
       pois = [], visiblePois = [],
-      keyPress = {}
+      keyPress = {},
+      showing = false
   
   function adjustBounds(){
     var bounds = map.getBounds(),
@@ -128,7 +129,8 @@ function renderHomePage(){
         ZOOM_IN = 73,
         ZOOM_OUT = 79,
         PREV = 81,
-        NEXT = 69
+        NEXT = 69,
+        SELECT = 70
 
     if(keyPress[UP]) center.lat += movement
     if(keyPress[DOWN]) center.lat -= movement
@@ -137,8 +139,10 @@ function renderHomePage(){
     if(keyPress[UP] || keyPress[DOWN] || keyPress[LEFT] || keyPress[RIGHT]) map.setCenter(center)
     if(keyPress[ZOOM_IN] && map.getZoom() < 14) map.setZoom(map.getZoom() + 1)
     if(keyPress[ZOOM_OUT]) map.setZoom(map.getZoom() - 1)
-    if(keyPress[PREV]) console.log(visiblePois[0].el)
+    if(keyPress[PREV]) void(0)
     if(keyPress[NEXT]) void(0)
+    if(keyPress[SELECT]) showing ? hidePoiDetails() : poiView(visiblePois[3])
+
     
     if(event && event.type == 'keyup') {
       let which;
@@ -153,7 +157,7 @@ function renderHomePage(){
         })
       }
     }
-    // console.log(event.keyCode)
+    console.log(event.keyCode)
     if(event && event.type == 'keydown')
       google.maps.event.addListener(map, 'idle', ()=>{
         keyPressControl()
@@ -183,16 +187,16 @@ function renderHomePage(){
     `
   }
   function poiView(poi){
-    
+    showing = true
     var modal = $('#poi-detail-modal-bkg')
     modal.find('#poi-detail-modal-content').html( html`
-      <h2>${poi.name}</h2>
-      <p class="poi-descripcion">${poi.description}</p>
-      <div class="poi-div-photos" ></div>
-    `)
-    $.each(poi.photos,function(index,value){
-      $('.poi-div-photos').append("<img class='poi-img-photos'  src='"+this+"'> ");
-  });
+        <h2>${poi.name}</h2>
+        <p class="poi-descripcion">${poi.description}</p>
+        <div class="poi-div-photos" ></div>
+      `)
+      $.each(poi.photos,function(index,value){
+        $('.poi-div-photos').append("<img class='poi-img-photos'  src='"+this+"'> ");
+    });
     modal.removeClass('hide-me')
     modal.click(()=>{
       hidePoiDetails()
@@ -201,6 +205,7 @@ function renderHomePage(){
   }
 
   function hidePoiDetails(){
+    showing = false
     $('#poi-detail-modal-bkg').addClass('hide-me')
   }
 }
