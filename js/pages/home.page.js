@@ -110,7 +110,7 @@ function renderHomePage(){
   });
   
   function keyPressControl(event){
-    event && (keyPress[event.keyCode] = (event && event.type) == 'keydown')
+    event && (keyPress[event.keyCode] = event.type == 'keydown')
     var center = {
           lat: map.getCenter().lat(), 
           lng: map.getCenter().lng()
@@ -124,18 +124,30 @@ function renderHomePage(){
         ZOOM_OUT = 79,
         PREV = 81,
         NEXT = 69
-      
+
     if(keyPress[UP]) center.lat += movement
     if(keyPress[DOWN]) center.lat -= movement
     if(keyPress[LEFT]) center.lng -= movement
     if(keyPress[RIGHT]) center.lng += movement
     if(keyPress[UP] || keyPress[DOWN] || keyPress[LEFT] || keyPress[RIGHT]) map.setCenter(center)
-    
     if(keyPress[ZOOM_IN] && map.getZoom() < 14) map.setZoom(map.getZoom() + 1)
     if(keyPress[ZOOM_OUT]) map.setZoom(map.getZoom() - 1)
     if(keyPress[PREV]) console.log(visiblePois[0].el)
     if(keyPress[NEXT]) void(0)
     
+    if(event && event.type == 'keyup') {
+      let which;
+      let active = Object.keys(keyPress).some(el =>{
+        which = el
+        return keyPress[el]
+      })
+      if(active){
+        keyPressControl({
+          keyCode: which,
+          type: 'keydown'
+        })
+      }
+    }
     // console.log(event.keyCode)
     if(event && event.type == 'keydown')
       google.maps.event.addListener(map, 'idle', ()=>{
