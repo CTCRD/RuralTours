@@ -114,7 +114,7 @@ function renderPoiPage(poi){
     delete newPOI.lng
 
     Loading.show()
-    axios[poi ? "put" : "post"]('http://api.ruraltours.online/api/pois', newPOI).then(()=>{
+    axios[poi ? "put" : "post"]('http://api.ruraltours.online/api/pois' + (poi ? '/' + poi.id : ''), newPOI).then(()=>{
       Loading.hide()
       swal("Sitio " + (poi ? "actualizado!" : "agregado!"), "", "success").then( res =>{
         res && Router.reload()
