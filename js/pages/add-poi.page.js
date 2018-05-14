@@ -2,7 +2,7 @@ function renderPoiPage(poi){
   var app = $('#app').html( html`
     <div id='content'>
       <div id="go-to-home">&#215;</div>
-      <h2>Rural Tours - Agregar sitio</h2>
+      <h2>Rural Tours - ${poi ? "Actualizar" : "Agregar"} sitio</h2>
       <form action="javascript:void(0)">
         <div class="row three">
           <div class="input-group">
@@ -73,8 +73,9 @@ function renderPoiPage(poi){
           dangerMode: true,
         }).then( res =>{
           if(res){
-            let find = $(e.target).find('img').attr('src')
+            let find = $(e.currentTarget).find('img').attr('src')
             sources.splice(sources.indexOf(find),1)
+            
             e.currentTarget.remove()
           }
         })
@@ -114,7 +115,7 @@ function renderPoiPage(poi){
     delete newPOI.lng
 
     Loading.show()
-    axios[poi ? "put" : "post"]('http://api.ruraltours.online/api/pois' + (poi ? '/' + poi.id : ''), newPOI).then(()=>{
+    axios.put('http://api.ruraltours.online/api/pois', newPOI).then(()=>{
       Loading.hide()
       swal("Sitio " + (poi ? "actualizado!" : "agregado!"), "", "success").then( res =>{
         res && Router.reload()

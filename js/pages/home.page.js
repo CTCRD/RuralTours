@@ -83,8 +83,8 @@ function renderHomePage(){
       side.html('')
   
       visiblePois = pois.filter( poi => map.getBounds().contains(poi.location))
-      visiblePois.forEach( poi =>{
-        side.append(poiSide(poi))
+      visiblePois.forEach(poi =>{
+        side.append(poi.el || poiSide(poi))
       })
     }
   }
@@ -97,11 +97,11 @@ function renderHomePage(){
         map: map,
         icon: '/img/rural_icon.png'
       })
-      marker.addListener('click', ()=>{poiView(poi)})
+      marker.addListener('click', ()=>{ poiView(poi) })
       markers.push(marker)
       side.append(poiSide(poi))
       let current = side.children().last()
-      current.click(()=>{
+      current.get(0).addEventListener('click', ()=>{
         renderPoiPage(poi)
       })
 
@@ -116,12 +116,12 @@ function renderHomePage(){
   });
   
   function keyPressControl(event){
-    event && (keyPress[event.keyCode] = event.type == 'keydown')
+    event && event.keyCode && (keyPress[event.keyCode] = event.type == 'keydown')
     var center = {
           lat: map.getCenter().lat(),
           lng: map.getCenter().lng()
         },
-        movement =( 22-map.getZoom())/1000,
+        movement =( 22-map.getZoom() )/1000,
         UP = 87,
         DOWN = 83,
         LEFT = 65,
@@ -137,32 +137,12 @@ function renderHomePage(){
     if(keyPress[LEFT]) center.lng -= movement
     if(keyPress[RIGHT]) center.lng += movement
     if(keyPress[UP] || keyPress[DOWN] || keyPress[LEFT] || keyPress[RIGHT]) map.setCenter(center)
+
     if(keyPress[ZOOM_IN] && map.getZoom() < 14) map.setZoom(map.getZoom() + 1)
     if(keyPress[ZOOM_OUT]) map.setZoom(map.getZoom() - 1)
     if(keyPress[PREV]) void(0)
     if(keyPress[NEXT]) void(0)
     if(keyPress[SELECT]) showing ? hidePoiDetails() : poiView(visiblePois[3])
-
-    
-    if(event && event.type == 'keyup') {
-      let which;
-      let active = Object.keys(keyPress).some(el =>{
-        which = el
-        return keyPress[el]
-      })
-      if(active){
-        keyPressControl({
-          keyCode: which,
-          type: 'keydown'
-        })
-      }
-    }
-    console.log(event.keyCode)
-    if(event && event.type == 'keydown')
-      google.maps.event.addListener(map, 'idle', ()=>{
-        keyPressControl()
-        google.maps.event.clearListeners(map, 'idle')
-      })
   }
 
   document.addEventListener('keydown', keyPressControl);
@@ -182,7 +162,6 @@ function renderHomePage(){
       <div class="poi-side">
         <img src='${poi.photos[0]}'/>
         <span>${poi.name}</span>
-        <!-- <span>${poi.description}</span> -->
       </div>
     `
   }

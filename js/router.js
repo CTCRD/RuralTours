@@ -1,15 +1,15 @@
 var Router = (() =>{
   let callbacks = {
-    'home':()=>{ renderHomePage() },
-    'add-poi':()=>{ renderPoiPage() },
+    'home': renderHomePage,
+    'add-poi': renderPoiPage,
   }
 
-  function reload(){
+  function reload(args){
     let hash = window.location.pathname.substr(1).split('/')
-    if (callbacks[hash[0]]) callbacks[hash[0]]()
+    if (callbacks[hash[0]]) callbacks[hash[0]](args)
     else {
       window.location.hash = ''
-      callbacks['home']()
+      callbacks['home'](args)
     }
   }
 
@@ -23,9 +23,9 @@ var Router = (() =>{
     else return []
   }
 
-  function go(hash){
+  function go(hash, ...args){
     history.pushState(null, null, (hash == 'home' || !hash ? '/' : hash));
-    reload()
+    reload(args)
   }
   
   window.onpopstate = ()=>{
