@@ -89,7 +89,7 @@ function renderHomePage(){
     }
   }
  
-  axios.get('http://api.ruraltours.online/api/pois').then((response) =>{
+  axios.get('https://api.ruraltours.online/api/pois').then((response) =>{
     response.data.reverse().forEach(poi =>{
       let side =  $('#side-bar')
       let marker = new google.maps.Marker({
