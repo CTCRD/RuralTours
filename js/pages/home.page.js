@@ -13,7 +13,6 @@ function renderHomePage(){
     </div>
     <div id="poi-detail-modal-bkg" class="hide-me">
       <div id="poi-detail-modal-content" style="width">
-
       </div>
     </div>
     
@@ -35,16 +34,16 @@ function renderHomePage(){
         { lat: 20.068997, lng: -68.007257 } /* NE */
       ),
       strictSW = {
-        lat: strictBounds.getSouthWest().lat(),
-        lng: strictBounds.getSouthWest().lng()
+        lat: parseFloat(strictBounds.getSouthWest().lat().toFixed(6)),
+        lng: parseFloat(strictBounds.getSouthWest().lng().toFixed(6))
       },
       strictNE = {
-        lat: strictBounds.getNorthEast().lat(),
-        lng: strictBounds.getNorthEast().lng()
+        lat: parseFloat(strictBounds.getNorthEast().lat().toFixed(6)),
+        lng: parseFloat(strictBounds.getNorthEast().lng().toFixed(6))
       },
       prevSW = strictSW,
       prevNE = strictNE,
-      timeout = 0, timeout2 = 0
+      timeout = 0,
       markers = [],
       pois = [], visiblePois = [],
       keyPress = {},
@@ -53,13 +52,13 @@ function renderHomePage(){
   function adjustBounds(){
     var bounds = map.getBounds(),
         newSW = {
-          lat: bounds.getSouthWest().lat(),
-          lng: bounds.getSouthWest().lng()
+          lat: parseFloat(bounds.getSouthWest().lat().toFixed(6)),
+          lng: parseFloat(bounds.getSouthWest().lng().toFixed(6))
         },
         newNE = {
-          lat: bounds.getNorthEast().lat(),
-          lng: bounds.getNorthEast().lng()
-        },
+          lat: parseFloat(bounds.getNorthEast().lat().toFixed(6)),
+          lng: parseFloat(bounds.getNorthEast().lng().toFixed(6))
+        },  
         adjust = false
 
     if(newSW.lat < strictSW.lat) (newSW.lat = strictSW.lat) && (adjust = true)
@@ -75,8 +74,8 @@ function renderHomePage(){
   }
 
   function reloadPois(){
-    clearTimeout(timeout2)
-    timeout2 = setTimeout(proceed, 100)
+    clearTimeout(timeout)
+    timeout = setTimeout(proceed, 100)
 
     function proceed(){
       let side = $('#side-bar')
@@ -117,6 +116,7 @@ function renderHomePage(){
   
   function keyPressControl(event){
     event && event.keyCode && (keyPress[event.keyCode] = event.type == 'keydown')
+
     var center = {
           lat: map.getCenter().lat(),
           lng: map.getCenter().lng()
@@ -144,14 +144,12 @@ function renderHomePage(){
     if(keyPress[NEXT]) void(0)
     if(keyPress[SELECT]) showing ? hidePoiDetails() : poiView(visiblePois[3])
   }
+  
+  document.addEventListener('keydown', keyPressControl)
+  document.addEventListener('keyup', keyPressControl)
+  google.maps.event.addListener(map, 'idle', keyPressControl)
 
-  document.addEventListener('keydown', keyPressControl);
-  document.addEventListener('keyup', keyPressControl);
-
-  google.maps.event.addListener(map, 'bounds_changed', ()=>{
-    clearTimeout(timeout)
-    timeout = setTimeout(adjustBounds, 10)
-  });
+  google.maps.event.addListener(map, 'bounds_changed', adjustBounds)
 
   google.maps.event.addListener(map, 'zoom_changed', reloadPois)
   google.maps.event.addListener(map, 'dragend', reloadPois)
@@ -165,6 +163,7 @@ function renderHomePage(){
       </div>
     `
   }
+  
   function poiView(poi){
     showing = true
     var modal = $('#poi-detail-modal-bkg')
@@ -177,9 +176,7 @@ function renderHomePage(){
         $('.poi-div-photos').append("<img class='poi-img-photos'  src='"+this+"'> ");
     });
     modal.removeClass('hide-me')
-    modal.click(()=>{
-      hidePoiDetails()
-    })
+    modal.click( hidePoiDetails )
         
   }
 
